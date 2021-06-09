@@ -422,7 +422,7 @@ public class DBproject{
 	  // Given a patient, a doctor and an appointment of the doctor that s/he wants to take, add an appointment to the DB
 	  try{
             String patient_name1, patient_gender1, address1;
-            int patient_age1, patient_id1 = -1;
+            int patient_age1 = -1, patient_id1 = -1, total = 0, appnt_id1 = -1, doctor_id1 = -1;
             
             System.out.println("Input Patient Name: ");
             patient_name1 = in.readLine();
@@ -433,14 +433,26 @@ public class DBproject{
             System.out.println("Input Patient Address: ");
             address1 = in.readLine();
 
-            String query = "SELECT p.patient_ID FROM Patient p WHERE p.name = " + patient_name1 + ", p.gtype = " + patient_gender1 + ", p.age = " + patient_age1 + ", p.address = " + address1 + ";\n";
-            
-            List<List<String>> rs = esql.executeQueryAndReturnResult(query);
-            patient_id1 = Integer.parseInt(rs.get(0).get(0));
+            String query = "SELECT p.patient_ID FROM Patient p WHERE p.name = ? AND p.gtype = ? AND p.age = ? AND p.address = ?;\n";
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setString(1, patient_name1);
+            preparedStmt.setString(2, patient_gender1);
+            preparedStmt.setInt(3, patient_age1);
+            preparedStmt.setString(4, address1);
+            ResultSet rs1 = preparedStmt.executeQuery(); //FIXME
+            if (rs1.next() ) {
+              patient_id1 = rs1.getInt("patient_ID");
+            } else {
+              patient_id1 = -1;
+            }
+
+
+            //List<List<String>> rs = esql.executeQueryAndReturnResult(query);
+            //patient_id1 = Integer.parseInt(rs.get(0).get(0));
             if (patient_id1 == -1) { //Create Patient
               System.out.println("Patient does not exist. Creating patient");
               query = "SELECT MAX(p.patient_id) FROM Patient p";
-              rs = esql.executeQueryAndReturnResult(query);
+              List<List<String>> rs = esql.executeQueryAndReturnResult(query);
 
               patient_id1 = Integer.parseInt(rs.get(0).get(0));
 
@@ -451,7 +463,7 @@ public class DBproject{
               }
 
               query = "INSERT INTO Patient(patient_ID, name, gtype, age, address, number_of_appts) VALUES(?, ?, ?, ?, ?, ?);\n";
-              PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+              preparedStmt = esql._connection.prepareStatement(query);
               preparedStmt.setInt (1, patient_id1);
               preparedStmt.setString (2, patient_name1);
               preparedStmt.setString (3, patient_gender1);
@@ -462,6 +474,60 @@ public class DBproject{
               //Patient Created.
             }
             //Check if doctor ID and appointment ID exist. Also increment number_of_appts FIXME
+            System.out.println("Input Doctor ID: ");
+            doctor_id1 = Integer.parseInt(in.readLine());
+            query = "SELECT COUNT(*) AS total FROM Doctor d WHERE d.doctor_ID = ?;\n";
+            preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setInt(1, doctor_id1);
+            rs1 = preparedStmt.executeQuery();
+            rs1.next();
+            total = rs1.getInt("total");
+            if (total < 1) {
+              System.out.println("Doctor does not exist. Returning to menu.");
+            }
+            else { //Doctor and patient exist
+              System.out.println("Input Appointment ID: ");
+              appnt_id1 = Integer.parseInt(in.readLine());
+              query = "SELECT COUNT(*) AS total2 FROM has_appointment ha WHERE ha.appt_id = ? AND ha.doctor_id = ?;\n";
+              preparedStmt = esql._connection.prepareStatement(query);
+              preparedStmt.setInt(1, appnt_id1);
+              preparedStmt.setInt(2, doctor_id1);
+              rs1 = preparedStmt.executeQuery();
+              rs1.next();
+              total = rs1.getInt("total2");
+              if (total < 1) {
+                System.out.println("Error. Appointment ID is not associated with Doctor ID");
+              }
+              else { //Appointment ID with matching doctor ID exists.
+                query = "SELECT a.status FROM Appointment a WHERE a.appnt_ID = ?;\n";
+                preparedStmt = esql._connection.prepareStatement(query);
+                preparedStmt.setInt(1, appnt_id1);
+                rs1 = preparedStmt.executeQuery();
+                rs1.next();
+                String stat1 = rs1.getString("status");
+                if (stat1 == "AV") { //Update Status and increment appnt_num
+                  query = "UPDATE Appointment SET status = AC WHERE appnt_ID = ?;\n";
+                  preparedStmt = esql._connection.prepareStatement(query);
+                  preparedStmt.setInt(1, appnt_id1);
+                  preparedStmt.execute();
+                  query = "UPDATE Patient SET number_of_appts = number_of_appts + 1 WHERE patient_ID = ?;\n";
+                  preparedStmt = esql._connection.prepareStatement(query);
+                  preparedStmt.setInt(1, patient_id1);
+                  preparedStmt.execute();
+                } else if (stat1 == "AC") { //Update Status and increment appnt_num
+                  query = "UPDATE Appointment SET status = WL WHERE appnt_ID = ?;\n";
+                  preparedStmt = esql._connection.prepareStatement(query);
+                  preparedStmt.setInt(1, appnt_id1);
+                  preparedStmt.execute();
+                  query = "UPDATE Patient SET number_of_appts = number_of_appts + 1 WHERE patient_ID = ?;\n";
+                  preparedStmt = esql._connection.prepareStatement(query);
+                  preparedStmt.setInt(1, patient_id1);
+                  preparedStmt.execute();
+                }
+                
+              }
+            }
+            
 
           }catch(Exception e){
             System.err.println (e.getMessage());
