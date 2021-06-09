@@ -331,8 +331,8 @@ public class DBproject{
             preparedStmt.setString (3, specialty1);
             preparedStmt.setInt (4, did1);
             preparedStmt.execute();
-            //int rowCount = esql.executeQuery(query);
-            //System.out.println ("total row(s): " + rowCount);
+            
+            System.out.println("Doctor ID: " + doctor_id1);
           }catch(Exception e){
             System.err.println (e.getMessage());
           }
@@ -373,6 +373,8 @@ public class DBproject{
             preparedStmt.setString(5, address1);
             preparedStmt.setInt(6, num_appts1);
             preparedStmt.execute();
+
+            System.out.println("Patient ID: " + patient_id1);
           }catch(Exception e){
             System.err.println (e.getMessage());
           }
@@ -394,9 +396,9 @@ public class DBproject{
               appnt_id1 = 0;
             }
 
-            System.out.println("Input Appointment Date (MM/DD/YYYY): ");
+            System.out.println("Input Appointment Date (YYYY/MM/DD): ");
             stringDate = in.readLine();
-            SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy");
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
             java.util.Date date1 = sdf1.parse(stringDate);
             adate1 = new java.sql.Date(date1.getTime());
             System.out.println("Input Appointment Time Slot (HH:MM-HH:MM): ");
@@ -412,6 +414,8 @@ public class DBproject{
             preparedStmt.setString (3, time_slot1);
             preparedStmt.setString(4, status1);
             preparedStmt.execute();
+
+            System.out.println("Appointment ID: " + appnt_id1);
           }catch(Exception e){
             System.err.println (e.getMessage());
           }
@@ -439,7 +443,7 @@ public class DBproject{
             preparedStmt.setString(2, patient_gender1);
             preparedStmt.setInt(3, patient_age1);
             preparedStmt.setString(4, address1);
-            ResultSet rs1 = preparedStmt.executeQuery(); //FIXME
+            ResultSet rs1 = preparedStmt.executeQuery();
             if (rs1.next() ) {
               patient_id1 = rs1.getInt("patient_ID");
             } else {
@@ -473,7 +477,7 @@ public class DBproject{
               preparedStmt.execute();
               //Patient Created.
             }
-            //Check if doctor ID and appointment ID exist. Also increment number_of_appts FIXME
+            //Check if doctor ID and appointment ID exist. Also increment number_of_appts
             System.out.println("Input Doctor ID: ");
             doctor_id1 = Integer.parseInt(in.readLine());
             query = "SELECT COUNT(*) AS total FROM Doctor d WHERE d.doctor_ID = ?;\n";
@@ -535,7 +539,42 @@ public class DBproject{
 	}
 
 	public static void ListAppointmentsOfDoctor(DBproject esql) {//5
-		// For a doctor ID and a date range, find the list of active and available appointments of the doctor
+	  // For a doctor ID and a date range, find the list of active and available appointments of the doctor
+          try{
+            int doctor_id1;
+            String stringDate;
+            java.sql.Date start_date1, end_date1;
+            //String query1 = "SELECT MAX(d.doctor_id) FROM Doctor d";
+            //List<List<String>> rs = esql.executeQueryAndReturnResult(query1);
+
+            //doctor_id1 = Integer.parseInt(rs.get(0).get(0));
+
+            System.out.println("Input Doctor ID: ");
+            doctor_id1 = Integer.parseInt(in.readLine());
+            System.out.println("Input Start Date (YYYY/MM/DD): ");
+            stringDate = in.readLine();
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+            java.util.Date date1 = sdf1.parse(stringDate);
+            start_date1 = new java.sql.Date(date1.getTime());
+            System.out.println("Input End Date (YYYY/MM/DD): ");
+            stringDate = in.readLine();
+            date1 = sdf1.parse(stringDate);
+            end_date1 = new java.sql.Date(date1.getTime());
+
+            //Initial Input Read In. Write Query
+            String query = "SELECT a.appnt_ID, a.adate, a.time_slot, a.status FROM Appointment a INNER JOIN has_appointment ha ON a.appnt_id = ha.appt_id WHERE a.adate > ? AND a.adate < ? AND (a.status = 'AV' OR a.status = 'AC') AND ha.doctor_id = ?;\n";
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setDate (1, start_date1);
+            preparedStmt.setDate (2, end_date1);
+            preparedStmt.setInt (3, doctor_id1);
+            ResultSet rs = preparedStmt.executeQuery();
+
+            while(rs.next()) {
+              System.out.println("appnt_ID: " + rs.getInt("appnt_ID") + ", date: " + rs.getDate("adate") + ", time_slot: " + rs.getString("time_slot") + ", status: " + rs.getString("status"));
+            }
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	public static void ListAvailableAppointmentsOfDepartment(DBproject esql) {//6
