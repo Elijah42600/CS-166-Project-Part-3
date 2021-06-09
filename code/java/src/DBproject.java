@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
+import java.sql.*;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -298,9 +299,80 @@ public class DBproject{
 	}//end readChoice
 
 	public static void AddDoctor(DBproject esql) {//1
+          try{
+            int doctor_id1, did1;
+            String name1, specialty1;
+            String query1 = "SELECT MAX(d.doctor_id) FROM Doctor d";
+            List<List<String>> rs = esql.executeQueryAndReturnResult(query1);
+
+            doctor_id1 = Integer.parseInt(rs.get(0).get(0));
+
+            doctor_id1 += 1;
+            //System.out.println("Max ID: " + doctor_id1);
+            if (doctor_id1 <= 0) {
+              doctor_id1 = 0;
+            }
+
+            System.out.println("Input Doctor Name: ");
+            name1 = in.readLine();
+            System.out.println("Input department ID: ");
+            did1 = Integer.parseInt(in.readLine());
+            System.out.println("Input specialty: ");
+            specialty1 = in.readLine();
+
+            //error handling when did does not exist. - Handled by sql.
+            String query = "INSERT INTO Doctor(doctor_ID, name, specialty, did) VALUES(?, ?, ?, ?);\n";
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setInt (1, doctor_id1);
+            preparedStmt.setString (2, name1);
+            preparedStmt.setString (3, specialty1);
+            preparedStmt.setInt (4, did1);
+            preparedStmt.execute();
+            //int rowCount = esql.executeQuery(query);
+            //System.out.println ("total row(s): " + rowCount);
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	public static void AddPatient(DBproject esql) {//2
+          try{
+            int patient_id1, age1;
+            int num_appts1 = 0;
+            String name1, address1, gender1;
+            String query1 = "SELECT MAX(p.patient_id) FROM Patient p";
+            List<List<String>> rs = esql.executeQueryAndReturnResult(query1);
+
+            patient_id1 = Integer.parseInt(rs.get(0).get(0));
+
+            patient_id1 += 1;
+            System.out.println("Max ID: " + patient_id1);
+            if (patient_id1 <= 0) {
+              patient_id1 = 0;
+            }
+
+            System.out.println("Input Patient Name: ");
+            name1 = in.readLine();
+            System.out.println("Input Patient Age: ");
+            age1 = Integer.parseInt(in.readLine());
+            System.out.println("Input Patient Gender (F or M): ");
+            gender1 = in.readLine();
+            System.out.println("Input Patient Address: ");
+            address1 = in.readLine();
+
+
+            String query = "INSERT INTO Patient(patient_ID, name, gtype, age, address, number_of_appts) VALUES(?, ?, ?, ?, ?. ?);\n";
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setInt (1, patient_id1);
+            preparedStmt.setString (2, name1);
+            preparedStmt.setString (3, gender1);
+            preparedStmt.setInt (4, age1);
+            preparedStmt.setString(5, address1);
+            preparedStmt.setInt(6, num_appts1);
+            preparedStmt.execute();
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	public static void AddAppointment(DBproject esql) {//3
