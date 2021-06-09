@@ -2,20 +2,21 @@
 
 Commands: (Run From Code)
 
-source postgresql/startPostgreSQL.sh
-source postgresql/createPostgreDB.sh
-cp data/*.csv /tmp/$USER/myDB/data/
-chmod +x java/compile.sh
-chmod +x java/run.sh
-psql -h localhost -p $PGPORT $USER"_DB" < sql/create.sql
-cd java/
-./compile.sh
-./run.sh
+- source postgresql/startPostgreSQL.sh
+- source postgresql/createPostgreDB.sh
+- cp data/*.csv /tmp/$USER/myDB/data/
+- chmod +x java/compile.sh
+- chmod +x java/run.sh
+- psql -h localhost -p $PGPORT $USER"_DB" < sql/create.sql
+- cd java/
+- ./compile.sh
+- ./run.sh
 
 Assumptions:
 1) Doctor ID will be assigned by system, and cannot be passed in.
  - Department ID must already exist as a department.
-2) d
+2) Patient ID will be assigned by system, and cannot be passed in.
+ - Patient must be created before assigning appointments, so num_appts starts at 0.
 3) d
 4) d
 5) d
