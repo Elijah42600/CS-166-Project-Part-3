@@ -419,7 +419,51 @@ public class DBproject{
 
 
 	public static void MakeAppointment(DBproject esql) {//4
-		// Given a patient, a doctor and an appointment of the doctor that s/he wants to take, add an appointment to the DB
+	  // Given a patient, a doctor and an appointment of the doctor that s/he wants to take, add an appointment to the DB
+	  try{
+            string patient_name1, patient_gender1;
+            int patient_age1, patient_id1 = -1;
+            
+            System.out.println("Input Patient Name: ");
+            patient_name1 = in.readLine();
+            System.out.println("Input Patient Gender (F or M): ");
+            patient_gender1 = in.readLine();
+            System.out.println("Input Patient Age: ");
+            patient_age1 = Integer.parseInt(in.readLine());
+
+            String query = "SELECT p.patient_ID FROM Patient p WHERE p.name = " + patient_name1 + ", p.gtype = " + patient_gender1 + ", p.age = " + patient_age1 + ";\n";
+            
+            List<List<String>> rs = esql.executeQueryAndReturnResult(query);
+            patient_id1 = Integer.parseInt(rs.get(0).get(0));
+            if (patient_id1 == -1) { //Create Patient
+              System.out.println("Patient does not exist. Creating patient");
+              query = "SELECT MAX(p.patient_id) FROM Patient p";
+            List<List<String>> rs = esql.executeQueryAndReturnResult(query);
+
+            patient_id1 = Integer.parseInt(rs.get(0).get(0));
+
+            patient_id1 += 1;
+            //System.out.println("Max ID: " + patient_id1);
+            if (patient_id1 <= 0) {
+              patient_id1 = 0;
+            }
+
+              query = "INSERT INTO Patient(patient_ID, name, gtype, age, address, number_of_appts) VALUES(?, ?, ?, ?, ?, ?);\n";
+              PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+              preparedStmt.setInt (1, patient_id1);
+              preparedStmt.setString (2, name1);
+              preparedStmt.setString (3, gender1);
+              preparedStmt.setInt (4, age1);
+              preparedStmt.setString(5, address1);
+              preparedStmt.setInt(6, num_appts1);
+              preparedStmt.execute();
+              //Patient Created.
+            }
+            //Check if doctor ID and appointment ID exist. FIXME
+
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	public static void ListAppointmentsOfDoctor(DBproject esql) {//5
