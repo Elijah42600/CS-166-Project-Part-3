@@ -17,7 +17,7 @@ Assumptions:
  - Department ID must already exist as a department.
 2) Patient ID will be assigned by system, and cannot be passed in.
  - Patient must be created before assigning appointments, so num_appts starts at 0.
-3) d
+3) Appointment time_slot, date, and status are all assumed to be valid.
 4) d
 5) d
 6) d
