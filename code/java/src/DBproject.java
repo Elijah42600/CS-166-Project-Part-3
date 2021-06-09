@@ -24,6 +24,9 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.sql.Date;
+//import java.util.Date;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -346,7 +349,7 @@ public class DBproject{
             patient_id1 = Integer.parseInt(rs.get(0).get(0));
 
             patient_id1 += 1;
-            System.out.println("Max ID: " + patient_id1);
+            //System.out.println("Max ID: " + patient_id1);
             if (patient_id1 <= 0) {
               patient_id1 = 0;
             }
@@ -361,7 +364,7 @@ public class DBproject{
             address1 = in.readLine();
 
 
-            String query = "INSERT INTO Patient(patient_ID, name, gtype, age, address, number_of_appts) VALUES(?, ?, ?, ?, ?. ?);\n";
+            String query = "INSERT INTO Patient(patient_ID, name, gtype, age, address, number_of_appts) VALUES(?, ?, ?, ?, ?, ?);\n";
             PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
             preparedStmt.setInt (1, patient_id1);
             preparedStmt.setString (2, name1);
@@ -376,7 +379,43 @@ public class DBproject{
 	}
 
 	public static void AddAppointment(DBproject esql) {//3
-	}
+          try{
+            int appnt_id1;
+            java.sql.Date adate1;
+            String status1, time_slot1, stringDate;
+            String query1 = "SELECT MAX(a.appnt_ID) FROM Appointment a";
+            List<List<String>> rs = esql.executeQueryAndReturnResult(query1);
+
+            appnt_id1 = Integer.parseInt(rs.get(0).get(0));
+
+            appnt_id1 += 1;
+            System.out.println("Max ID: " + appnt_id1);
+            if (appnt_id1 <= 0) {
+              appnt_id1 = 0;
+            }
+
+            System.out.println("Input Appointment Date (MM/DD/YYYY): ");
+            stringDate = in.readLine();
+            SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy");
+            java.util.Date date1 = sdf1.parse(stringDate);
+            adate1 = new java.sql.Date(date1.getTime());
+            System.out.println("Input Appointment Time Slot (HH:MM-HH:MM): ");
+            time_slot1 = in.readLine();
+            System.out.println("Input Appointment Status (PA, AC, AV, or WL): ");
+            status1 = in.readLine();
+
+
+            String query = "INSERT INTO Appointment (appnt_ID, adate, time_slot, status) VALUES(?, ?, ?, ?);\n";
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setInt (1, appnt_id1);
+            preparedStmt.setDate (2, adate1);
+            preparedStmt.setString (3, time_slot1);
+            preparedStmt.setString(4, status1);
+            preparedStmt.execute();
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
+        }
 
 
 	public static void MakeAppointment(DBproject esql) {//4
