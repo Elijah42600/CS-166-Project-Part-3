@@ -578,7 +578,31 @@ public class DBproject{
 	}
 
 	public static void ListAvailableAppointmentsOfDepartment(DBproject esql) {//6
-		// For a department name and a specific date, find the list of available appointments of the department
+	  // For a department name and a specific date, find the list of available appointments of the department
+	  try{
+            String department_name1, stringDate;
+            java.sql.Date adate1;
+            String query = "SELECT a.appnt_ID, a.adate, a.time_slot, a.status FROM Appointment a INNER JOIN has_appointment ha ON a.appnt_id = ha.appt_id INNER JOIN Doctor d ON ha.doctor_id = d.doctor_ID INNER JOIN Department de ON d.did = de.dept_ID WHERE a.adate = ? AND de.name = ? AND a.status = 'AV'";
+
+            System.out.println("Input Department Name: ");
+            department_name1 = in.readLine();
+            System.out.println("Input Date (YYYY/MM/DD): ");
+            stringDate = in.readLine();
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+            java.util.Date date1 = sdf1.parse(stringDate);
+            adate1 = new java.sql.Date(date1.getTime());
+            System.out.println("FIXME");
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setString (2, department_name1);
+            preparedStmt.setDate (1, adate1);
+            ResultSet rs = preparedStmt.executeQuery();
+
+            while (rs.next() ) {
+              System.out.println("appnt_ID: " + rs.getInt("appnt_ID") + ", date: " + rs.getDate("adate") + ", time_slot: " + rs.getString("time_slot") + ", status: " + rs.getString("status"));
+            }
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	public static void ListStatusNumberOfAppointmentsPerDoctor(DBproject esql) {//7
