@@ -20,7 +20,8 @@ Assumptions:
 3) Appointment time_slot, date, and status are all assumed to be valid.
 4) Appointment ID and Doctor ID must already exist.
 - Appointment must already belong to doctor in has_appointment
-5) d
+5) Assumes date range in inclusive. 
+ - Does not discriminate between Departments with the same name.
 6) d
 7) d
 8) d
