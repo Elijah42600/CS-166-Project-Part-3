@@ -591,7 +591,7 @@ public class DBproject{
             SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
             java.util.Date date1 = sdf1.parse(stringDate);
             adate1 = new java.sql.Date(date1.getTime());
-            System.out.println("FIXME");
+            
             PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
             preparedStmt.setString (2, department_name1);
             preparedStmt.setDate (1, adate1);
@@ -606,11 +606,33 @@ public class DBproject{
 	}
 
 	public static void ListStatusNumberOfAppointmentsPerDoctor(DBproject esql) {//7
-		// Count number of different types of appointments per doctors and list them in descending order
+          // Count number of different types of appointments per doctors and list them in descending order
+          try {
+            //FIXME
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 
 	
 	public static void FindPatientsCountWithStatus(DBproject esql) {//8
-		// Find how many patients per doctor there are with a given status (i.e. PA, AC, AV, WL) and list that number per doctor.
+	  // Find how many patients per doctor there are with a given status (i.e. PA, AC, AV, WL) and list that number per doctor.
+	  try {
+            String status1;
+            String query = "SELECT d.doctor_ID, COUNT(a.appnt_id) AS count FROM Doctor d INNER JOIN has_appointment ha ON d.doctor_ID = ha.doctor_id INNER JOIN Appointment a ON ha.appt_id = a .appnt_ID WHERE a.status = ? GROUP BY d.doctor_ID;\n";
+            
+            System.out.println("Input Status: (PA, AC, AV, or WL): ");
+            status1 = in.readLine();
+
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            preparedStmt.setString (1, status1);
+            ResultSet rs = preparedStmt.executeQuery();
+
+            while (rs.next()) {
+              System.out.println("doctor_ID: " + rs.getInt("doctor_ID") + ", num_appnts with status " + status1 + ": " + rs.getInt("count"));
+            }
+          }catch(Exception e){
+            System.err.println (e.getMessage());
+          }
 	}
 }
