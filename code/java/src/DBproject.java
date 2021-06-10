@@ -608,7 +608,14 @@ public class DBproject{
 	public static void ListStatusNumberOfAppointmentsPerDoctor(DBproject esql) {//7
           // Count number of different types of appointments per doctors and list them in descending order
           try {
-            //FIXME
+            String query = "SELECT d.doctor_ID, COUNT(DISTINCT a.status) AS count FROM Doctor d INNER JOIN has_appointment ha ON d.doctor_ID = ha.doctor_id INNER JOIN Appointment a ON ha.appt_id = a.appnt_ID GROUP BY d.doctor_ID ORDER BY count DESC;\n";
+            
+            PreparedStatement preparedStmt = esql._connection.prepareStatement(query);
+            ResultSet rs = preparedStmt.executeQuery();
+
+            while (rs.next() ) {
+              System.out.println("doctor_ID: " + rs.getString("doctor_ID") + ", types of appointments: " + rs.getInt("count"));
+            }
           }catch(Exception e){
             System.err.println (e.getMessage());
           }
