@@ -26,5 +26,6 @@ Assumptions:
 6) Does not discriminate between Departments with the same name. 
  - Assumes Department Name is valid.
  - Date must be in YYYY/MM/DD format.
-7) d
+7) Assumes "total number of different types of appointments" means amount of different statuses belonging to doctor.
+ - Does not output doctors with no appointments.
 8) Patient will not have more than one appointment of the same type.
