@@ -21,7 +21,10 @@ Assumptions:
 4) Appointment ID and Doctor ID must already exist.
 - Appointment must already belong to doctor in has_appointment
 5) Assumes date range in inclusive. 
- - Does not discriminate between Departments with the same name.
-6) d
+ - Date must be in YYYY/MM/DD format.
+ - Assumes Doctor exists.
+6) Does not discriminate between Departments with the same name. 
+ - Assumes Department Name is valid.
+ - Date must be in YYYY/MM/DD format.
 7) d
 8) Patient will not have more than one appointment of the same type.
