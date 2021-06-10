@@ -24,5 +24,4 @@ Assumptions:
  - Does not discriminate between Departments with the same name.
 6) d
 7) d
-8) d
-9) d
+8) Patient will not have more than one appointment of the same type.
